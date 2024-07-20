@@ -95,6 +95,7 @@ fun ExchangeCard(
                 color = Black500,
                 fontSize = 12.sp
             )
+            Spacer(modifier = Modifier.height(1.dp))
             Text(
                 text = currency.date,
                 color = Black500,
