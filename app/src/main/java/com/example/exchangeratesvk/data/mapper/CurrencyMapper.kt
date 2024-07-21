@@ -9,7 +9,7 @@ class CurrencyMapper @Inject constructor() {
     fun mapCurrencyDtoToCurrency(currencyDto: CurrencyDto) : Currency {
         return Currency(
             currencyName = currencyDto.currencyName,
-            date = currencyDto.date,
+            date = currencyDto.date.substring(0,currencyDto.date.length-5),
             allCurrenciesList = currencyDto.allCurrenciesList
         )
     }

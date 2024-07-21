@@ -19,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.exchangeratesvk.R
 import com.example.exchangeratesvk.ui.theme.Black500
 
 @Composable
@@ -41,7 +43,7 @@ fun ResultScreen(
     ) {
         Column{
             Text(
-                text = "Конвертер валют",
+                text = stringResource(R.string.exchangeRateName),
                 fontSize = 30.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -51,7 +53,6 @@ fun ResultScreen(
                 fontSize = 16.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
-            val sum = (countRate.toFloat() * quantity.toFloat()).toString()
             OutlinedTextField(
                 modifier = Modifier
                     .width(240.dp)
@@ -62,7 +63,7 @@ fun ResultScreen(
                 textStyle = TextStyle(fontSize = 12.sp),
                 onValueChange = {  },
                 singleLine = true,
-                placeholder = { Text(text = "${sum} ${nameRateIn}", color = Color.Black, fontSize = 18.sp) }
+                placeholder = { Text(text = "${quantity} ${nameRateIn}", color = Color.Black, fontSize = 18.sp) }
             )
             Spacer(modifier = Modifier.height(10.dp))
             Button(
@@ -78,7 +79,7 @@ fun ResultScreen(
                 ),
                 border = BorderStroke(1.dp, Color.Black)
             ) {
-                Text(text = "Вернуться назад")
+                Text(text = stringResource(R.string.comeBack))
             }
         }
     }

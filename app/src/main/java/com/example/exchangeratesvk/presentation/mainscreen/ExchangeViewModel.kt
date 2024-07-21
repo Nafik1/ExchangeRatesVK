@@ -1,5 +1,6 @@
 package com.example.exchangeratesvk.presentation.mainscreen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.exchangeratesvk.data.Repository.ExchangeRateRepositoryImpl
@@ -7,52 +8,49 @@ import com.example.exchangeratesvk.data.model.CurrencyDto
 import com.example.exchangeratesvk.domain.entity.Currency
 import com.example.exchangeratesvk.domain.entity.ExhangeRateState
 import com.example.exchangeratesvk.domain.usecases.ChangeCurrencyUseCase
+import com.example.exchangeratesvk.domain.usecases.LoadCurrencyUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ExchangeViewModel @Inject constructor(
     private val changeCurrencyUseCase: ChangeCurrencyUseCase,
+    private val loadCurrencyUseCase: LoadCurrencyUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ExhangeRateState<Currency>>(ExhangeRateState.Loading)
     val state: StateFlow<ExhangeRateState<Currency>> get() = _state.asStateFlow()
 
     init {
+        Log.d("aufaufauf",_state.value.toString())
         viewModelScope.launch {
-            loadCurrency("USD").collect {
+            loadCurrency().collect {
                 _state.value = it
             }
         }
+        Log.d("aufaufauf",_state.value.toString())
     }
 
-    fun loadCurrency(currencyName: String): Flow<ExhangeRateState<Currency>> {
-        return changeCurrencyUseCase.invoke(currencyName)
+    fun loadCurrency(): Flow<ExhangeRateState<Currency>> {
+        return loadCurrencyUseCase.invoke()
     }
 
     fun onCurrencyChange(currencyName: String) {
         viewModelScope.launch {
-            var newCurrency: ExhangeRateState.Success<Currency>? = null
             changeCurrencyUseCase.invoke(currencyName).collect {
-                if (it is ExhangeRateState.Success) {
-                    newCurrency = it
-                }
-            }
-            val newCurrencyFinal = newCurrency
-            if(newCurrencyFinal != null) {
-                changeCurrencyUseCase.invoke(currencyName).collect {
-                    if (_state.value is ExhangeRateState.Success) {
-                        _state.value = (_state.value as ExhangeRateState.Success<Currency>).copy(
-                            data = newCurrencyFinal.data
-                        )
-                    }
-                }
+                _state.value = ExhangeRateState.Success<Currency>(
+                    data = it.data
+                )
             }
         }
     }
 
+    fun calculation(sum: String, rate: String): String {
+        return (sum.toFloat() * rate.toFloat()).toString()
+    }
 
 }

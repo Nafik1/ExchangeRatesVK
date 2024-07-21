@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">ExchangeRatesVK</string>
+    <string name="errorMessage">Произошла ошибка:</string>
+    <string name="exchangeRateName">Конвертер валют</string>
+    <string name="calculateButton">Вычислить</string>
+    <string name="selectData">Выберите данные</string>
+    <string name="enterAmount">Введите сумму</string>
+    <string name="courseUpdateDate">Дата обновления курса:</string>
+    <string name="comeBack">Вернуться назад</string>
 </resources>

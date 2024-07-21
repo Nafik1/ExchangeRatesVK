@@ -11,7 +11,7 @@ class ChangeCurrencyUseCase @Inject constructor(
     private val repositoryImpl: ExchangeRateRepositoryImpl
 ) {
 
-    operator fun invoke(currencyName : String) : Flow<ExhangeRateState<Currency>> {
-        return repositoryImpl.getCurrencyList(currencyName)
+    operator fun invoke(currencyName : String) : Flow<ExhangeRateState.Success<Currency>> {
+        return repositoryImpl.getCurrencyList(currencyName) as Flow<ExhangeRateState.Success<Currency>>
     }
 }

@@ -31,16 +31,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.exchangeratesvk.R
 import com.example.exchangeratesvk.data.model.CurrencyDto
 import com.example.exchangeratesvk.domain.entity.Currency
 import com.example.exchangeratesvk.domain.entity.ExhangeRateState
@@ -72,12 +75,13 @@ fun ExchangeCard(
     onClickListenner: (String, String, String, String) -> Unit,
     viewModel: ExchangeViewModel
 ) {
-    var expandedWith by remember { mutableStateOf(false) }
-    var expandedIn by remember { mutableStateOf(false) }
-    val nameRateWith = remember { mutableStateOf("") }
-    val countRate = remember { mutableStateOf("") }
-    val nameRateIn = remember { mutableStateOf("") }
-    val quantityRate = remember { mutableStateOf("") }
+    var expandedWith by rememberSaveable { mutableStateOf(false) }
+    var expandedIn by rememberSaveable { mutableStateOf(false) }
+    val nameRateWith = rememberSaveable { mutableStateOf("") }
+    val countRate = rememberSaveable { mutableStateOf("") }
+    val nameRateIn = rememberSaveable { mutableStateOf("") }
+    val quantityRate = rememberSaveable { mutableStateOf("") }
+    val listOfCurrencies = listOf("USD","RUB","EUR","CNY","GBP")
     val ctx = LocalContext.current
     Box(
         modifier = Modifier
@@ -87,11 +91,11 @@ fun ExchangeCard(
     ) {
         Column {
             Text(
-                text = "Конвертер валют",
+                text = stringResource(R.string.exchangeRateName),
                 fontSize = 30.sp
             )
             Text(
-                text = "Дата обновления курса:",
+                text = stringResource(R.string.courseUpdateDate),
                 color = Black500,
                 fontSize = 12.sp
             )
@@ -110,7 +114,13 @@ fun ExchangeCard(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onValueChange = { newText -> countRate.value = newText },
                 singleLine = true,
-                placeholder = { Text(text = "Введите сумму", color = Black500, fontSize = 14.sp) }
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.enterAmount),
+                        color = Black500,
+                        fontSize = 14.sp
+                    )
+                }
             )
             Spacer(modifier = Modifier.height(12.dp))
             Row(
@@ -144,7 +154,7 @@ fun ExchangeCard(
                         expanded = expandedWith,
                         onDismissRequest = { expandedWith = false }
                     ) {
-                        for (rate in currency.allCurrenciesList.keys) {
+                        for (rate in listOfCurrencies) {
                             Text(
                                 text = rate,
                                 fontSize = 18.sp,
@@ -202,7 +212,7 @@ fun ExchangeCard(
                         expanded = expandedIn,
                         onDismissRequest = { expandedIn = false }
                     ) {
-                        for (rate in currency.allCurrenciesList.keys) {
+                        for (rate in listOfCurrencies) {
                             Text(
                                 text = rate,
                                 fontSize = 18.sp,
@@ -231,10 +241,10 @@ fun ExchangeCard(
                             countRate.value,
                             nameRateWith.value,
                             nameRateIn.value,
-                            quantityRate.value
+                            viewModel.calculation(quantityRate.value,countRate.value)
                         )
                     } else {
-                        ctx.showToast("Выберите данные")
+                        ctx.showToast(ctx.getString(R.string.selectData))
                     }
                 },
                 modifier = Modifier
@@ -246,7 +256,7 @@ fun ExchangeCard(
                 ),
                 border = BorderStroke(1.dp, Color.Black)
             ) {
-                Text(text = "Вычислить")
+                Text(text = stringResource(R.string.calculateButton))
             }
         }
     }
@@ -262,12 +272,12 @@ fun Error(exception: Throwable) {
     ) {
         Column {
             Text(
-                text = "Конвертер валют",
+                text = stringResource(R.string.exchangeRateName),
                 fontSize = 30.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Произошла ошибка:",
+                text = stringResource(R.string.errorMessage),
                 fontSize = 24.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
