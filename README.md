@@ -4,4 +4,4 @@ The source code of the application was written in Kotlin. MVVM was used as an ar
 Currency transfer is carried out using the API https://app.exchangerate-api.com/.
 ## Screenshots
 ![](screenshots/mainmenu.png)
-![](Screenshots/resultmenu.png)
+![](screenshots/resultmenu.png)
