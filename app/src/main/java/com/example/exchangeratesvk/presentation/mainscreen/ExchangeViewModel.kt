@@ -4,17 +4,13 @@ import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.exchangeratesvk.data.Repository.ExchangeRateRepositoryImpl
-import com.example.exchangeratesvk.data.model.CurrencyDto
 import com.example.exchangeratesvk.domain.entity.Currency
 import com.example.exchangeratesvk.domain.entity.ExhangeRateState
 import com.example.exchangeratesvk.domain.usecases.ChangeCurrencyUseCase
 import com.example.exchangeratesvk.domain.usecases.LoadCurrencyUseCase
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

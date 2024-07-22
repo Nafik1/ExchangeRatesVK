@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 class NavigationState(
     val navHostController: NavHostController
 ) {
-    fun navigateTo(route : String) {
+    fun navigateTo(route: String) {
         navHostController.navigate(route) {
             launchSingleTop = true
             popUpTo(navHostController.graph.findStartDestination().id) {
@@ -18,16 +18,12 @@ class NavigationState(
             restoreState = true
         }
     }
-
-//    fun navigateToResult(count : String, nameWith : String, nameIn : String, quantity : String) {
-//        navHostController.navigate(Screen.ResultScreen.getRouteWithArgs(count,nameWith,nameIn,quantity))
-//    }
 }
 
 @Composable
 fun rememberNavigationState(
     navHostController: NavHostController = rememberNavController()
-) : NavigationState {
+): NavigationState {
     return remember {
         NavigationState(navHostController)
     }
