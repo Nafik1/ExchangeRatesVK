@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 fun AppNavGraph(
     navHostContoller: NavHostController,
     mainScreenContent: @Composable () -> Unit,
-    resultScreenContent: @Composable (String,String,String,String) -> Unit
+    resultScreenContent: @Composable () -> Unit
 ) {
     NavHost(
         navController = navHostContoller,
@@ -19,11 +19,7 @@ fun AppNavGraph(
                 mainScreenContent()
             }
             composable(Screen.ResultScreen.route) {
-                val count = it.arguments?.getString(Screen.KEY_COUNT_RATE) ?: ""
-                val nameWith = it.arguments?.getString(Screen.KEY_NAMEWITH_RATE) ?: ""
-                val nameIn = it.arguments?.getString(Screen.KEY_NAMEIN_RATE) ?: ""
-                val quantity = it.arguments?.getString(Screen.KEY_QUANTITY_RATE) ?: ""
-                resultScreenContent(count,nameWith,nameIn,quantity)
+                resultScreenContent()
             }
         }
 

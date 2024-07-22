@@ -19,9 +19,9 @@ class NavigationState(
         }
     }
 
-    fun navigateToResult(count : String, nameWith : String, nameIn : String, quantity : String) {
-        navHostController.navigate(Screen.ResultScreen.getRouteWithArgs(count,nameWith,nameIn,quantity))
-    }
+//    fun navigateToResult(count : String, nameWith : String, nameIn : String, quantity : String) {
+//        navHostController.navigate(Screen.ResultScreen.getRouteWithArgs(count,nameWith,nameIn,quantity))
+//    }
 }
 
 @Composable

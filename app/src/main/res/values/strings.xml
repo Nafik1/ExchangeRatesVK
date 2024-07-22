@@ -7,4 +7,6 @@
     <string name="enterAmount">Введите сумму</string>
     <string name="courseUpdateDate">Дата обновления курса:</string>
     <string name="comeBack">Вернуться назад</string>
+    <string name="retry">Попробовать еще раз</string>
+    <string name="changeOtherCurrency">Выберите разные валюты</string>
 </resources>

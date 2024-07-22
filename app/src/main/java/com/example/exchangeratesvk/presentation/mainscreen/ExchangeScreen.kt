@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -52,18 +54,18 @@ import com.example.exchangeratesvk.ui.theme.Black500
 @Composable
 fun ExchangeScreen(
     exchangeViewModel: ExchangeViewModel,
-    onClickListenner: (String, String, String, String) -> Unit
+    onConvertClick: () -> Unit
 ) {
+    val state by exchangeViewModel.state.collectAsState()
+    when {
+        state.error != null -> ErrorState(state.error!!, onRetryClick = {
+            exchangeViewModel.onRetryClick()
+        })
 
-    val viewModel = exchangeViewModel.state.collectAsState(initial = ExhangeRateState.Loading)
-    val currentState = viewModel.value
-
-    when (currentState) {
-        is ExhangeRateState.Error -> Error(currentState.exception)
-        is ExhangeRateState.Loading -> ProgressBar()
-        is ExhangeRateState.Success -> ExchangeCard(
-            currency = currentState.data,
-            onClickListenner = onClickListenner,
+        state.isLoading -> ProgressBar()
+        else -> ExchangeCard(
+            state = state,
+            onConvertClick = onConvertClick,
             viewModel = exchangeViewModel
         )
     }
@@ -71,22 +73,17 @@ fun ExchangeScreen(
 
 @Composable
 fun ExchangeCard(
-    currency: Currency,
-    onClickListenner: (String, String, String, String) -> Unit,
+    state: ExchangeScreenState,
+    onConvertClick: () -> Unit,
     viewModel: ExchangeViewModel
 ) {
-    var expandedWith by rememberSaveable { mutableStateOf(false) }
-    var expandedIn by rememberSaveable { mutableStateOf(false) }
-    val nameRateWith = rememberSaveable { mutableStateOf("") }
-    val countRate = rememberSaveable { mutableStateOf("") }
-    val nameRateIn = rememberSaveable { mutableStateOf("") }
-    val quantityRate = rememberSaveable { mutableStateOf("") }
-    val listOfCurrencies = listOf("USD","RUB","EUR","CNY","GBP")
+    var expandedFirst by rememberSaveable { mutableStateOf(false) }
+    var expandedSecond by rememberSaveable { mutableStateOf(false) }
     val ctx = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 200.dp),
+            .fillMaxHeight(),
         contentAlignment = Alignment.Center
     ) {
         Column {
@@ -94,25 +91,29 @@ fun ExchangeCard(
                 text = stringResource(R.string.exchangeRateName),
                 fontSize = 30.sp
             )
-            Text(
-                text = stringResource(R.string.courseUpdateDate),
-                color = Black500,
-                fontSize = 12.sp
-            )
-            Spacer(modifier = Modifier.height(1.dp))
-            Text(
-                text = currency.date,
-                color = Black500,
-                fontSize = 12.sp
-            )
+            state.date?.let {
+                Text(
+                    text = stringResource(R.string.courseUpdateDate),
+                    color = Black500,
+                    fontSize = 12.sp
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+                Text(
+                    text = it,
+                    color = Black500,
+                    fontSize = 12.sp
+                )
+            }
             OutlinedTextField(
                 modifier = Modifier
                     .width(240.dp)
                     .height(50.dp),
-                value = countRate.value,
+                value = state.enteredAmount,
                 textStyle = TextStyle(fontSize = 12.sp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                onValueChange = { newText -> countRate.value = newText },
+                onValueChange = { newText ->
+                    (viewModel.onCountRateChange(newText.filter { it.isDigit() }))
+                },
                 singleLine = true,
                 placeholder = {
                     Text(
@@ -128,7 +129,7 @@ fun ExchangeCard(
             ) {
                 Column {
                     Button(
-                        onClick = { expandedWith = !expandedWith },
+                        onClick = { expandedFirst = !expandedFirst },
                         modifier = Modifier
                             .width(100.dp)
                             .height(50.dp),
@@ -139,7 +140,7 @@ fun ExchangeCard(
                         border = BorderStroke(1.dp, Color.Black)
 
                     ) {
-                        Text(text = nameRateWith.value)
+                        Text(text = state.firstCurrency)
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
                             Icons.Default.Menu,
@@ -151,19 +152,18 @@ fun ExchangeCard(
                         modifier = Modifier
                             .width(100.dp)
                             .height(150.dp),
-                        expanded = expandedWith,
-                        onDismissRequest = { expandedWith = false }
+                        expanded = expandedFirst,
+                        onDismissRequest = { expandedFirst = false }
                     ) {
-                        for (rate in listOfCurrencies) {
+                        for (rate in state.availableCurrencies) {
                             Text(
                                 text = rate,
                                 fontSize = 18.sp,
                                 modifier = Modifier
                                     .padding(10.dp)
                                     .clickable {
-                                        nameRateWith.value = rate
-                                        viewModel.onCurrencyChange(nameRateWith.value)
-                                        expandedWith = false
+                                        viewModel.onFirstCurrencySelect(rate)
+                                        expandedFirst = false
                                     }
                             )
                         }
@@ -187,7 +187,7 @@ fun ExchangeCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Button(
-                        onClick = { expandedIn = !expandedIn },
+                        onClick = { expandedSecond = !expandedSecond },
                         modifier = Modifier
                             .width(100.dp)
                             .height(50.dp),
@@ -198,7 +198,7 @@ fun ExchangeCard(
                         border = BorderStroke(1.dp, Color.Black)
 
                     ) {
-                        Text(text = nameRateIn.value)
+                        Text(text = state.secondCurrency)
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
                             Icons.Default.Menu,
@@ -209,20 +209,18 @@ fun ExchangeCard(
                         modifier = Modifier
                             .width(100.dp)
                             .height(150.dp),
-                        expanded = expandedIn,
-                        onDismissRequest = { expandedIn = false }
+                        expanded = expandedSecond,
+                        onDismissRequest = { expandedSecond = false }
                     ) {
-                        for (rate in listOfCurrencies) {
+                        for (rate in state.availableCurrencies) {
                             Text(
                                 text = rate,
                                 fontSize = 18.sp,
                                 modifier = Modifier
                                     .padding(10.dp)
                                     .clickable {
-                                        nameRateIn.value = rate
-                                        quantityRate.value =
-                                            currency.allCurrenciesList[rate].toString()
-                                        expandedWith = false
+                                        viewModel.onSecondCurrencySelect(rate)
+                                        expandedSecond = false
                                     }
                             )
                         }
@@ -233,16 +231,15 @@ fun ExchangeCard(
             Button(
                 onClick = {
                     if (
-                        nameRateIn.value.isNotEmpty()
-                        && nameRateWith.value.isNotEmpty()
-                        && countRate.value.isNotEmpty()
+                        state.firstCurrency.isNotEmpty()
+                        && state.secondCurrency.isNotEmpty()
+                        && state.enteredAmount.isNotEmpty()
                     ) {
-                        onClickListenner(
-                            countRate.value,
-                            nameRateWith.value,
-                            nameRateIn.value,
-                            viewModel.calculation(quantityRate.value,countRate.value)
-                        )
+                        if (state.firstCurrency == state.secondCurrency) {
+                            ctx.showToast(ctx.getString(R.string.changeOtherCurrency))
+                        } else {
+                            onConvertClick()
+                        }
                     } else {
                         ctx.showToast(ctx.getString(R.string.selectData))
                     }
@@ -263,14 +260,18 @@ fun ExchangeCard(
 }
 
 @Composable
-fun Error(exception: Throwable) {
+fun ErrorState(
+    exception: Throwable,
+    onRetryClick: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 200.dp),
+            .fillMaxHeight()
+            .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Column {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.exchangeRateName),
                 fontSize = 30.sp
@@ -285,6 +286,10 @@ fun Error(exception: Throwable) {
                 text = exception.message.toString(),
                 fontSize = 24.sp
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { onRetryClick() }) {
+                Text(text = stringResource(R.string.retry))
+            }
         }
     }
 }

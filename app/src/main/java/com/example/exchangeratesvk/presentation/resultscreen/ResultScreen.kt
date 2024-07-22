@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,30 +28,29 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.exchangeratesvk.R
+import com.example.exchangeratesvk.presentation.mainscreen.ExchangeViewModel
 import com.example.exchangeratesvk.ui.theme.Black500
 
 @Composable
 fun ResultScreen(
-    countRate: String,
-    nameRateWith: String,
-    nameRateIn: String,
-    quantity : String,
+    viewModel: ExchangeViewModel,
     onBackPressed: () -> Unit
 ) {
+    val state by viewModel.state.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 240.dp),
+            .fillMaxHeight(),
         contentAlignment = Alignment.Center
     ) {
-        Column{
+        Column {
             Text(
                 text = stringResource(R.string.exchangeRateName),
                 fontSize = 30.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "${countRate} ${nameRateWith} =",
+                text = "${state.enteredAmount} ${state.firstCurrency} =",
                 color = Black500,
                 fontSize = 16.sp
             )
@@ -61,9 +63,15 @@ fun ResultScreen(
                 readOnly = true,
                 value = "",
                 textStyle = TextStyle(fontSize = 12.sp),
-                onValueChange = {  },
+                onValueChange = { },
                 singleLine = true,
-                placeholder = { Text(text = "${quantity} ${nameRateIn}", color = Color.Black, fontSize = 18.sp) }
+                placeholder = {
+                    Text(
+                        text = "${state.convertResult} ${state.secondCurrency}",
+                        color = Color.Black,
+                        fontSize = 18.sp
+                    )
+                }
             )
             Spacer(modifier = Modifier.height(10.dp))
             Button(

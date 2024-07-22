@@ -2,13 +2,14 @@ package com.example.exchangeratesvk.presentation
 
 import androidx.compose.runtime.Composable
 import com.example.exchangeratesvk.navigation.AppNavGraph
+import com.example.exchangeratesvk.navigation.Screen
 import com.example.exchangeratesvk.navigation.rememberNavigationState
 import com.example.exchangeratesvk.presentation.mainscreen.ExchangeScreen
 import com.example.exchangeratesvk.presentation.mainscreen.ExchangeViewModel
 import com.example.exchangeratesvk.presentation.resultscreen.ResultScreen
 
 @Composable
-fun BasicScreen(viewModel : ExchangeViewModel) {
+fun BasicScreen(viewModel: ExchangeViewModel) {
     val navigationState = rememberNavigationState()
 
     AppNavGraph(
@@ -16,14 +17,14 @@ fun BasicScreen(viewModel : ExchangeViewModel) {
         mainScreenContent = {
             ExchangeScreen(
                 exchangeViewModel = viewModel,
-                onClickListenner = { count, namewith, namein, quantity ->
-                    navigationState.navigateToResult(count,namewith,namein,quantity)
+                onConvertClick = {
+                    navigationState.navigateTo(Screen.ROUTE_RESULT)
                 }
             )
         },
-        resultScreenContent = { count, namewith, namein, quantity ->
+        resultScreenContent = {
             ResultScreen(
-                count,namewith,namein,quantity,
+                viewModel = viewModel,
                 onBackPressed = { navigationState.navHostController.popBackStack() }
             )
         }
